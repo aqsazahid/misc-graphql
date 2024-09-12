@@ -1,6 +1,6 @@
 const { ApolloServer } = require('@apollo/server')
 const { startStandaloneServer } = require('@apollo/server/standalone')
-const { v1: uuid } = require('uuid')
+
 let authors = [
   {
     name: 'Robert Martin',
@@ -98,35 +98,23 @@ let books = [
 */
 
 const typeDefs = `
-  type Book  {
+  type Books  {
     title: String!
     author: String!
-    published: Int!
-    genres: [String!]!
+    published: Boolean!
+    genres: String!
   }
 
-  type Author {
+  type Authors {
     name: String!
-    born: Int
     bookCount: Int!
-  } 
+  }
 
   type Query {
     bookCount: Int!
     authorCount: Int!
-    // allBooks: [Book!]!
-    allBooks(genre: String, author: String): [Book!]!
-    allAuthors: [Author!]!
-  }
-
-  type Mutation {
-    addBook(
-      title: String!
-      author: String
-      published: Int!
-      genres: [String!]!
-    ): Book
-    editAuthor(name: String!, setBornTo: Int!): Author
+    allBooks: [Books!]!
+    allAuthors: [Authors!]!
   }
 `
 
@@ -134,52 +122,8 @@ const resolvers = {
   Query: {
     bookCount: () => books.length,
     authorCount: () => authors.length,
-    // allBooks: () => books,
-    allBooks: (root, args) => {
-      let filteredBooks = books;
-
-      if (args.author) {
-        filteredBooks = filteredBooks.filter(book => book.author === args.author);
-      }
-      if (args.genre) {
-        filteredBooks = filteredBooks.filter(book => book.genres.includes(args.genre));
-      }
-
-      return filteredBooks;
-    },
+    allBooks: () => books,
     allAuthors: () => authors
-  },
-  Mutation: {
-    addBook: (root, args) => {
-      const existingAuthor = authors.find(a => a.name === args.author)
-      if (!existingAuthor) {
-        const newAuthor = {
-          name: args.author,
-          born: null,
-          bookCount: 1,
-        }
-        authors = authors.concat(newAuthor)
-      } else {
-        existingAuthor.bookCount += 1
-      }
-      const newBook = {
-        title: args.title,
-        author: args.author,
-        published: args.published,
-        genres: args.genres,
-      }
-
-      books = books.concat(newBook)
-      return newBook
-    },
-    editAuthor: (root, args) => {
-      const author = authors.find(a => a.name === args.name)
-      if (!author) {
-        return null 
-      }
-      author.born = args.setBornTo
-      return author
-    }
   }
 }
 

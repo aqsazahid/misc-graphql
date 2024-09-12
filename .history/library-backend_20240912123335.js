@@ -1,6 +1,6 @@
 const { ApolloServer } = require('@apollo/server')
 const { startStandaloneServer } = require('@apollo/server/standalone')
-const { v1: uuid } = require('uuid')
+
 let authors = [
   {
     name: 'Robert Martin',
@@ -105,9 +105,8 @@ const typeDefs = `
     genres: [String!]!
   }
 
-  type Author {
+  type Authors {
     name: String!
-    born: Int
     bookCount: Int!
   } 
 
@@ -116,7 +115,7 @@ const typeDefs = `
     authorCount: Int!
     // allBooks: [Book!]!
     allBooks(genre: String, author: String): [Book!]!
-    allAuthors: [Author!]!
+    allAuthors: [Authors!]!
   }
 
   type Mutation {
@@ -126,8 +125,7 @@ const typeDefs = `
       published: Int!
       genres: [String!]!
     ): Book
-    editAuthor(name: String!, setBornTo: Int!): Author
-  }
+}
 `
 
 const resolvers = {
@@ -148,38 +146,6 @@ const resolvers = {
       return filteredBooks;
     },
     allAuthors: () => authors
-  },
-  Mutation: {
-    addBook: (root, args) => {
-      const existingAuthor = authors.find(a => a.name === args.author)
-      if (!existingAuthor) {
-        const newAuthor = {
-          name: args.author,
-          born: null,
-          bookCount: 1,
-        }
-        authors = authors.concat(newAuthor)
-      } else {
-        existingAuthor.bookCount += 1
-      }
-      const newBook = {
-        title: args.title,
-        author: args.author,
-        published: args.published,
-        genres: args.genres,
-      }
-
-      books = books.concat(newBook)
-      return newBook
-    },
-    editAuthor: (root, args) => {
-      const author = authors.find(a => a.name === args.name)
-      if (!author) {
-        return null 
-      }
-      author.born = args.setBornTo
-      return author
-    }
   }
 }
 

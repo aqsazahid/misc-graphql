@@ -107,7 +107,6 @@ const typeDefs = `
 
   type Author {
     name: String!
-    born: Int
     bookCount: Int!
   } 
 
@@ -126,7 +125,6 @@ const typeDefs = `
       published: Int!
       genres: [String!]!
     ): Book
-    editAuthor(name: String!, setBornTo: Int!): Author
   }
 `
 
@@ -153,6 +151,7 @@ const resolvers = {
     addBook: (root, args) => {
       const existingAuthor = authors.find(a => a.name === args.author)
       if (!existingAuthor) {
+        // Add a new author
         const newAuthor = {
           name: args.author,
           born: null,
@@ -160,6 +159,7 @@ const resolvers = {
         }
         authors = authors.concat(newAuthor)
       } else {
+        // Increment bookCount for existing author
         existingAuthor.bookCount += 1
       }
       const newBook = {
@@ -171,14 +171,6 @@ const resolvers = {
 
       books = books.concat(newBook)
       return newBook
-    },
-    editAuthor: (root, args) => {
-      const author = authors.find(a => a.name === args.name)
-      if (!author) {
-        return null 
-      }
-      author.born = args.setBornTo
-      return author
     }
   }
 }
