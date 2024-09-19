@@ -1,0 +1,23 @@
+{
+  "name": "misc",
+  "version": "1.0.0",
+  "description": "## part0b, 1st diagram",
+  "main": "library-backend.js",
+  "scripts": {
+    "start": "node library-backend.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aqsazahid/misc-graphql.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aqsazahid/misc-graphql/issues"
+  },
+  "homepage": "https://github.com/aqsazahid/misc-graphql#readme",
+  "dependencies": {
+    "@apollo/server": "^4.11.0"
+  }
+}

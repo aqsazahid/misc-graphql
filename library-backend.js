@@ -114,7 +114,7 @@ const typeDefs = `
   type Query {
     bookCount: Int!
     authorCount: Int!
-    // allBooks: [Book!]!
+    # allBooks: [Book!]!
     allBooks(genre: String, author: String): [Book!]!
     allAuthors: [Author!]!
   }
@@ -130,13 +130,80 @@ const typeDefs = `
   }
 `
 
+// const resolvers = {
+//   Query: {
+//     bookCount: () => books.length,
+//     authorCount: () => authors.length,
+//     // allBooks: () => books,
+//     allBooks: (root, args) => {
+//       let filteredBooks = books;
+
+//       if (args.author) {
+//         filteredBooks = filteredBooks.filter(book => book.author === args.author);
+//       }
+//       if (args.genre) {
+//         filteredBooks = filteredBooks.filter(book => book.genres.includes(args.genre));
+//       }
+
+//       return filteredBooks;
+//     },
+//     // allAuthors: () => authors
+//      allAuthors: () => {
+//       return authors.map(author => {
+//         const bookCount = books.filter(book => book.author === author.name).length;
+//         return {
+//           ...author,
+//           bookCount: bookCount,  // Ensure bookCount is always set
+//         };
+//       });
+//     }
+//   },
+//   Mutation: {
+//     addBook: (root, args) => {
+//   try {
+//     const existingAuthor = authors.find(a => a.name === args.author);
+//     if (!existingAuthor) {
+//       const newAuthor = {
+//         name: args.author,
+//         born: null,
+//         bookCount: 1,
+//       };
+//       authors = authors.concat(newAuthor);
+//     } else {
+//       existingAuthor.bookCount += 1;
+//     }
+//     const newBook = {
+//       title: args.title,
+//       author: args.author,
+//       published: args.published,
+//       genres: args.genres,
+//     };
+
+//     books = books.concat(newBook);
+//     return newBook;
+//   } catch (error) {
+//     console.error("Error in addBook resolver:", error);
+//     throw new Error("Failed to add book");
+//   }
+// }
+//     editAuthor: (root, args) => {
+//       const author = authors.find(a => a.name === args.name)
+//       if (!author) {
+//         return null 
+//       }
+//       author.born = args.setBornTo
+//       return author
+//     }
+//   }
+// }
+
 const resolvers = {
   Query: {
     bookCount: () => books.length,
     authorCount: () => authors.length,
-    // allBooks: () => books,
     allBooks: (root, args) => {
       let filteredBooks = books;
+      console.log("request" + filteredBooks )
 
       if (args.author) {
         filteredBooks = filteredBooks.filter(book => book.author === args.author);
@@ -147,41 +214,55 @@ const resolvers = {
 
       return filteredBooks;
     },
-    allAuthors: () => authors
+    allAuthors: () => {
+      return authors.map(author => {
+        const bookCount = books.filter(book => book.author === author.name).length;
+        return {
+          ...author,
+          bookCount: bookCount,  
+        };
+      });
+    }
   },
   Mutation: {
     addBook: (root, args) => {
-      const existingAuthor = authors.find(a => a.name === args.author)
-      if (!existingAuthor) {
-        const newAuthor = {
-          name: args.author,
-          born: null,
-          bookCount: 1,
+      try {
+        const existingAuthor = authors.find(a => a.name === args.author);
+        if (!existingAuthor) {
+          const newAuthor = {
+            name: args.author,
+            born: null,
+            bookCount: 1,
+          };
+          authors = authors.concat(newAuthor);
+        } else {
+          existingAuthor.bookCount += 1;
         }
-        authors = authors.concat(newAuthor)
-      } else {
-        existingAuthor.bookCount += 1
-      }
-      const newBook = {
-        title: args.title,
-        author: args.author,
-        published: args.published,
-        genres: args.genres,
-      }
+        const newBook = {
+          title: args.title,
+          author: args.author,
+          published: args.published,
+          genres: args.genres,
+        };
 
-      books = books.concat(newBook)
-      return newBook
+        books = books.concat(newBook);
+        return newBook;
+      } catch (error) {
+        console.error("Error in addBook resolver:", error);
+        throw new Error("Failed to add book");
+      }
     },
     editAuthor: (root, args) => {
-      const author = authors.find(a => a.name === args.name)
+      const author = authors.find(a => a.name === args.name);
       if (!author) {
-        return null 
+        return null;
       }
-      author.born = args.setBornTo
-      return author
+      author.born = args.setBornTo;
+      return author;
     }
   }
 }
+
 
 const server = new ApolloServer({
   typeDefs,
