@@ -8,7 +8,6 @@ const bcrypt = require('bcryptjs')
 const User = require('./models/user') 
 const Author = require('./models/author')
 const Book = require('./models/book')
-
 let authors = [
   {
     name: 'Robert Martin',
@@ -97,16 +96,6 @@ const typeDefs = `
   id: ID!
 }
 
-type User {
-  username: String!
-  favoriteGenre: String!
-  id: ID!
-}
-
-type Token {
-  value: String!
-}
-
  type Author {
   name: String!
   born: Int
@@ -120,7 +109,6 @@ type Token {
     # allBooks: [Book!]!
     #allBooks(genre: String, author: String): [Book!]!
     #allAuthors: [Author!]!
-     me: User
   #}
 
   type Query {
@@ -136,18 +124,6 @@ type Token {
       genres: [String!]!
     ): Book
     editAuthor(name: String!, setBornTo: Int!): Author
-    createUser(
-      username: String!
-      favoriteGenre: String!
-    ): User
-     login(
-      username: String!
-      password: String!
-    ): Token
-  editAuthor(
-    name: String!
-    setBornTo: Int!
-  ): Author
   }
 `
 
@@ -347,24 +323,10 @@ const resolvers = {
 
 
 
-// const server = new ApolloServer({
-//   typeDefs,
-//   resolvers,
-// })
-
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: async ({ req }) => {
-    const auth = req ? req.headers.authorization : null
-    if (auth && auth.toLowerCase().startsWith('bearer ')) {
-      const decodedToken = jwt.verify(auth.substring(7), JWT_SECRET)
-      const currentUser = await User.findById(decodedToken.id)
-      return { currentUser }
-    }
-  }
 })
-
 
 startStandaloneServer(server, {
   listen: { port: 4000 },
