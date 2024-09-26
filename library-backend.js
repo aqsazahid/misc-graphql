@@ -1,4 +1,4 @@
-const { AuthenticationError, UserInputError } = require('apollo-server')
+const { AuthenticationError, UserInputError } = require('@apollo/server')
 const { ApolloServer } = require('@apollo/server')
 const { GraphQLError } = require('graphql')
 const { startStandaloneServer } = require('@apollo/server/standalone')
@@ -120,12 +120,13 @@ type Token {
     # allBooks: [Book!]!
     #allBooks(genre: String, author: String): [Book!]!
     #allAuthors: [Author!]!
-     me: User
+     #me: User
   #}
 
   type Query {
     allBooks(author: String, genre: String): [Book!]!
     allAuthors: [Author!]!
+     me: User
 }
 
   type Mutation {
@@ -144,10 +145,6 @@ type Token {
       username: String!
       password: String!
     ): Token
-  editAuthor(
-    name: String!
-    setBornTo: Int!
-  ): Author
   }
 `
 
@@ -197,19 +194,18 @@ const resolvers = {
     allBooks: async (root, args) => {
       const filter = {};
 
-      // If an author is provided, filter by author name
       if (args.author) {
         const author = await Author.findOne({ name: args.author });
         if (author) {
-          filter.author = author._id; // Filter books by the author's ID
+          filter.author = author._id; 
         } else {
-          return []; // If no author is found, return an empty list
+          return []; 
         }
       }
 
       // If a genre is provided, filter by genre
       if (args.genre) {
-        filter.genres = { $in: [args.genre] }; // Filter books where genres array includes the provided genre
+        filter.genres = { $in: [args.genre] }; 
       }
 
       // Find and return books with applied filters, populate the author field
